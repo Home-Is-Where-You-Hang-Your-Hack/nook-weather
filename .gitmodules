@@ -1,0 +1,6 @@
+[submodule "weather-icons"]
+	path = weather-icons
+	url = https://github.com/erikflowers/weather-icons
+	branch = master
+	shallow = true
+

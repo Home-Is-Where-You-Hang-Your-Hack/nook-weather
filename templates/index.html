@@ -1,54 +1,102 @@
 <html>
 <head>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='normalize.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <div class="row header">{{ now.time }}</div>
 
-<div id="main">
+  <!-- *********** Current Conditions *********** -->
+  <div class="main">
+    <div class="row current">
+      <div class="col-2">
+        <img  class="current-image" src="{{ now.icon }}" alt="" />
+      </div>
+      <div class="col-2">
+        <div class="temperature">
+          {% if now.temperature  is defined %}
+            {{ now.temperature | int }}&deg;
+          {% else %}
+            N/A
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-2 today">
+        <div>High <span class="highlow">{% if now.high is defined %}{{ now.high | int }}&deg;{% else %}N/A{% endif %}</span></div>
+        <div>Low <span class="highlow">{% if now.low is defined %}{{ now.low | int }}&deg;{% else %}N/A{% endif %}</span></div>
+        <div class="detail">Wind:{% if now.windSpeed is defined %}{{ now.windSpeed | int }}{% else %}N/A{% endif %} mph {{ now.windDir }}</div>
+        <div class="detail">Humidity: {% if now.humidity is defined %}{{ now.humidity | int }}%{% else %}N/A{% endif %}</div>
+        <div class="detail">Pressure: {% if now.pressure is defined %}{{ now.pressure / 100 | int }} mb{% else %}N/A{% endif %}</div>
+      </div>
+    </div>
+    <div class="row current-description">{{ now.hour }}</div>
 
-  <div id="date">{{ now.time }}</div>
 
-  <div id="current">
-    <img src="{{ ds.img_url }}/{{ now.icon }}.{{ ds.img_ext }}" alt="{{ now.icon }}" />
-    <div id="temp">{{ now.temperature | int }}&deg;</div>
-    <div id="highlow">{{ now.high | int }}&deg;&nbsp;H<br />{{ now.low | int }}&deg;&nbsp;L</div>
+    <!-- *********** Hourly forecast *********** -->
+    <div class="hourly-forecast-group">
+      <div class="row">
+        {% for item in hourly %}
+          <div class="col-1">{{ item.time }}</div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in hourly %}
+          <div class="col-1"><img class="forecast-image" src="{{ item.icon }}" /></div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in hourly %}
+          <div class="col-1">{% if item.temp is defined %}{{ item.temp | int }}&deg;{% else %}N/A{% endif %}</div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in hourly %}
+          <div class="col-1 forecast-description">{{ item.shortForecast }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- *********** Today's forecast *********** -->
+    <!-- <div class="row week-forecast">{{ now.forecast }}</div> -->
+
+    <!-- *********** Daily forecast *********** -->
+    <div class="daily-forecast-group">
+      <div class="row title">6 Day Forecast</div>
+      <div class="row">
+        {% for item in daily %}
+          <div class="col-1">{{ item.date }}</div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in daily %}
+          <div class="col-1">{{ item.day }}</div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in daily %}
+          <div class="col-1"><img class="forecast-image" src="{{ item.icon }}" /></div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in daily %}
+          <div class="col-1">
+            <span>{% if item.high is defined %}{{ item.high| int }}&deg;{% else %}N/A{% endif %}</span>
+            <span> / </span>
+            <span>{% if item.high is defined %}{{ item.low| int }}&deg;{% else %}N/A{% endif %}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="row">
+        {% for item in daily %}
+          <div class="col-1 forecast-description">{{ item.shortForecast }}</div>
+        {% endfor %}
+      </div>
+    </div>
   </div>
-  <div id="conditions">
-    <div id="text">{{ now.hour }}</div>
-    <div id="detail">Feels like:&nbsp;{{ now.apparentTemperature | int }}&deg;&nbsp;
-                     &nbsp;&nbsp;Wind:&nbsp;{{ now.windSpeed | int }}&nbsp;mph&nbsp;{{ now.windDir }}
-                     <br />
-                     Humidity:&nbsp;{{ now.humidity | int }}%&nbsp;&nbsp;
-                     UV&nbsp;Index:&nbsp;{{ now.uvIndex | int }}&nbsp;&nbsp;
-                     Pressure:&nbsp;{{ now.pressure | int }}&nbsp;mb</div>
+
+  <div class="footer row">
+    <div>Forecast from {{ now.city }}</div>
+    <div>Last Updated: {{ now.timestamp }}</div>
   </div>
-
-  <div class="forecast">
-    {% for item in hourly %}
-    <span class="next">
-      {{ item.time }}
-      <img src="{{ ds.img_url }}/{{ item.icon }}.{{ ds.img_ext }}" />
-      {{ item.temp | int }}&deg;
-    </span>
-    {% endfor %}
-  </div>
-
-  <div id="week">{{ now.forecast }}</div>
-
-  <div class="forecast">
-    {% for item in daily %}
-    <span class="next">
-      {{ item.day }}
-      <br />
-      {{ item.date }}
-      <img src=" {{ ds.img_url }}/{{ item.icon }}.{{ ds.img_ext }}" />
-      {{ item.high | int }}&deg;<br />{{ item.low | int }}&deg;
-    </span>
-    {% endfor %}
-  </div>
-
-  <div id="footer">{{ now.city }}<p />Last Updated: {{ now.timestamp }}</div>
-
-</div>
 </body>
 </html>
