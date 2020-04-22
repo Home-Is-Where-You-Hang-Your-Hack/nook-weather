@@ -14,7 +14,7 @@
       </div>
       <div class="col-2">
         <div class="temperature">
-          {% if now.temperature  is defined %}
+          {% if now.temperature  is not none %}
             {{ now.temperature | int }}&deg;
           {% else %}
             N/A
@@ -22,11 +22,11 @@
         </div>
       </div>
       <div class="col-2 today">
-        <div>High <span class="highlow">{% if now.high is defined %}{{ now.high | int }}&deg;{% else %}N/A{% endif %}</span></div>
-        <div>Low <span class="highlow">{% if now.low is defined %}{{ now.low | int }}&deg;{% else %}N/A{% endif %}</span></div>
-        <div class="detail">Wind:{% if now.windSpeed is defined %}{{ now.windSpeed | int }}{% else %}N/A{% endif %} mph {{ now.windDir }}</div>
-        <div class="detail">Humidity: {% if now.humidity is defined %}{{ now.humidity | int }}%{% else %}N/A{% endif %}</div>
-        <div class="detail">Pressure: {% if now.pressure is defined %}{{ now.pressure / 100 | int }} mb{% else %}N/A{% endif %}</div>
+        <div>High <span class="highlow">{% if now.high is not none %}{{ now.high | int }}&deg;{% else %}N/A{% endif %}</span></div>
+        <div>Low <span class="highlow">{% if now.low is not none %}{{ now.low | int }}&deg;{% else %}N/A{% endif %}</span></div>
+        <div class="detail">Wind:{% if now.windSpeed is not none %}{{ now.windSpeed | int }}{% else %}N/A{% endif %} mph {{ now.windDir }}</div>
+        <div class="detail">Humidity: {% if now.humidity is not none %}{{ now.humidity | int }}%{% else %}N/A{% endif %}</div>
+        <div class="detail">Pressure: {% if now.pressure is not none %}{{ now.pressure / 100 | int }} mb{% else %}N/A{% endif %}</div>
       </div>
     </div>
     <div class="row current-description">{{ now.hour }}</div>
@@ -46,7 +46,7 @@
       </div>
       <div class="row">
         {% for item in hourly %}
-          <div class="col-1">{% if item.temp is defined %}{{ item.temp | int }}&deg;{% else %}N/A{% endif %}</div>
+          <div class="col-1">{% if item.temp is not none %}{{ item.temp | int }}&deg;{% else %}N/A{% endif %}</div>
         {% endfor %}
       </div>
       <div class="row">
@@ -80,9 +80,9 @@
       <div class="row">
         {% for item in daily %}
           <div class="col-1">
-            <span>{% if item.high is defined %}{{ item.high| int }}&deg;{% else %}N/A{% endif %}</span>
+            <span>{% if item.high is not none %}{{ item.high| int }}&deg;{% else %}N/A{% endif %}</span>
             <span> / </span>
-            <span>{% if item.high is defined %}{{ item.low| int }}&deg;{% else %}N/A{% endif %}</span>
+            <span>{% if item.high is not none %}{{ item.low| int }}&deg;{% else %}N/A{% endif %}</span>
           </div>
         {% endfor %}
       </div>
