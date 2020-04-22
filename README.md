@@ -18,11 +18,23 @@ The icons provided with the NWS forecasts are not designed for e-ink displays an
 
 [Table of icon mapping](./icons.md)
 
+#### Docker
+| Enviromental parameter | Required | Description |
+| -- | -- | --|
+| `EMAIL` | Yes| NWS API requires a non-validated API key to prevent abuse.  It can be anything but prefers to use your email address.
+| `ZIP_CODE`| Yes | Location of weather forecast.  See limitations above if experiencing difficulties.
+|`BIND_PORT`| No | Port to bind HTTP server to.  Default is `3099`
 
 
-```
+Download or clone the NWS branch of this repo.  Build the docker image and run the container.
+```BASH
 docker build -t "nook-weather" .
-docker run -d -p 3099:3099 -e EMAIL="test@example.com" -e ZIP_CODE=<YOUR_ZIP_CODE> --name "nook-weather" nook-weather
+docker run -d \
+           -p 3099:3099 \
+           -e EMAIL="test@example.com" \
+           -e ZIP_CODE=<YOUR_ZIP_CODE> \
+           --name "nook-weather" \
+           nook-weather
 ```
 
 
