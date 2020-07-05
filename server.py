@@ -165,7 +165,7 @@ class nwsNookWeather:
         )
 
         now["humidity"] = observation_data["relativeHumidity"]
-        now["pressure"] = observation_data["barometricPressure"]
+        now["pressure"] = int(observation_data["barometricPressure"])
         now["temperature"] = self.convert_to_fahrenheit(observation_data["temperature"])
 
         hourly = list()
