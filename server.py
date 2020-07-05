@@ -57,13 +57,10 @@ class nwsNookWeather:
         return "N"
 
     def convert_to_fahrenheit(self, temperature):
-        if temperature["value"] is None:
-            return "N/A"
-
         """Convert celsius to fahrenheit"""
-        if temperature["unitCode"] == "unit:degC":
-            return (temperature["value"] * 1.8) + 32
-        return temperature["value"]
+        if isinstance(temperature, float):
+            return (temperature * 1.8) + 32
+        return "N/A"
 
     def get_location(self):
         """Latitude and longitude from postal zip code."""
@@ -82,6 +79,7 @@ class nwsNookWeather:
             self.lat = location.latitude
             self.long = location.longitude
         except GeopyError:
+            # TODO: retry if a 500 is given
             print(ZIP_ERROR_MSG, sys.exc_info()[0])
             sys.exit(1)
         except:
@@ -100,7 +98,7 @@ class nwsNookWeather:
         async with aiohttp.ClientSession() as session:
             if self.station is None:
                 try:
-                    res = await pynws.get_stn_from_pnt(
+                    res = await pynws.raw_points_stations(
                         self.lat, self.long, session, self.nws_user_id
                     )
                     station = res["features"][0]["properties"]
@@ -112,17 +110,17 @@ class nwsNookWeather:
                 except:
                     print("Failed to determine weather station", sys.exc_info()[0])
 
-            latlong = (self.lat, self.long)
-            nws = pynws.Nws(
-                session, latlon=latlong, station=self.station, userid=self.nws_user_id,
-            )
+            nws = pynws.SimpleNWS(self.lat, self.long, self.nws_user_id, session)
 
-            observation = await nws.observations(1)
-            daily = await nws.forecast()
-            hourly = await nws.forecast_hourly()
+            await nws.set_station()
+            await nws.update_observation(1)
+            await nws.update_forecast()
+            await nws.update_forecast_hourly()
 
-            if observation and daily and hourly:
-                return self.format_data(observation[0], hourly, daily)
+            if nws.observation and nws.forecast and nws.forecast_hourly:
+                return self.format_data(
+                    nws.observation, nws.forecast_hourly, nws.forecast
+                )
 
             return self.template_data()
 
@@ -160,14 +158,14 @@ class nwsNookWeather:
 
         now["high"] = max(daily_data[0]["temperature"], daily_data[1]["temperature"])
         now["low"] = min(daily_data[0]["temperature"], daily_data[1]["temperature"])
-        now["windSpeed"] = observation_data["windSpeed"]["value"]
-        now["windDir"] = self.compass(observation_data["windDirection"]["value"])
+        now["windSpeed"] = observation_data["windSpeed"]
+        now["windDir"] = self.compass(observation_data["windDirection"])
         now["icon"] = self.weather_icon(
             hourly_data[0]["icon"], hourly_data[0]["isDaytime"]
         )
 
-        now["humidity"] = observation_data["relativeHumidity"]["value"]
-        now["pressure"] = observation_data["barometricPressure"]["value"]
+        now["humidity"] = observation_data["relativeHumidity"]
+        now["pressure"] = observation_data["barometricPressure"]
         now["temperature"] = self.convert_to_fahrenheit(observation_data["temperature"])
 
         hourly = list()
