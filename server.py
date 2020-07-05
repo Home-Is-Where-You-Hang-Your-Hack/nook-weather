@@ -50,7 +50,7 @@ class nwsNookWeather:
             "NW": [292.5, 337.5],
         }
         for key, val in coords.items():
-            if val[0] <= bearing < val[1]:
+            if val[0] <= float(bearing) < val[1]:
                 return key
 
         # "N": [337.5, 360],
