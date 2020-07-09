@@ -110,26 +110,34 @@ class nwsNookWeather:
                 except:
                     print("Failed to determine weather station", sys.exc_info()[0])
 
-            nws = pynws.SimpleNWS(self.lat, self.long, self.nws_user_id, session)
+            try:
+                nws = pynws.SimpleNWS(self.lat, self.long, self.nws_user_id, session)
 
-            await nws.set_station()
-            await nws.update_observation(1)
-            await nws.update_forecast()
-            await nws.update_forecast_hourly()
+                await nws.set_station()
+                await nws.update_observation(1)
+                await nws.update_forecast()
+                await nws.update_forecast_hourly()
 
-            if nws.observation and nws.forecast and nws.forecast_hourly:
-                return self.format_data(
-                    nws.observation, nws.forecast_hourly, nws.forecast
-                )
-
-            return self.template_data()
+                if nws.observation and nws.forecast and nws.forecast_hourly:
+                    return self.format_data(
+                        nws.observation, nws.forecast_hourly, nws.forecast
+                    )
+            except ClientResponseError:
+                pass
 
     def get_weather(self):
         """Fetch weather from NWS API for the given postalcode."""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        nws = loop.run_until_complete(self.get_async_weather())
-        return nws
+        nws_weather = loop.run_until_complete(self.get_async_weather())
+
+        if nws_weather:
+            self.cached_data = nws_weather
+            return nws_weather
+        elif self.cached_data:
+            return self.cached_data
+
+        return self.template_data()
 
     def weather_icon(self, nws_icon_url, is_daytime):
         """Determine Eink friendly icon from icon provided from API."""
