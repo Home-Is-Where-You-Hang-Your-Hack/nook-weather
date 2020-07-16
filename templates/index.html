@@ -2,101 +2,101 @@
 <head>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='normalize.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <title>NWS Nook Weather</title>
 </head>
 <body>
-  <div class="row header">{{ now.time }}</div>
+  {% if data.is_valid %}
+  <div class="row header">{{ data.todays_date }}</div>
 
   <!-- *********** Current Conditions *********** -->
   <div class="main">
     <div class="row current">
       <div class="col-2">
-        <img  class="current-image" src="{{ now.icon }}" alt="" />
+        <img  class="current-image" src="{{ data.icon_src }}" alt="" />
       </div>
       <div class="col-2">
-        <div class="temperature">
-          {% if now.temperature  is not none %}
-            {{ now.temperature | int }}&deg;
-          {% else %}
-            N/A
-          {% endif %}
-        </div>
+        <div class="temperature">{{ data.temperature }}</div>
       </div>
       <div class="col-2 today">
-        <div>High <span class="highlow">{% if now.high is not none %}{{ now.high | int }}&deg;{% else %}N/A{% endif %}</span></div>
-        <div>Low <span class="highlow">{% if now.low is not none %}{{ now.low | int }}&deg;{% else %}N/A{% endif %}</span></div>
-        <div class="detail">Wind:{% if now.windSpeed is not none %}{{ now.windSpeed | int }}{% else %}N/A{% endif %} mph {{ now.windDir }}</div>
-        <div class="detail">Humidity: {% if now.humidity is not none %}{{ now.humidity | int }}%{% else %}N/A{% endif %}</div>
-        <div class="detail">Pressure: {% if now.pressure is not none %}{{ now.pressure / 100 | int }} mb{% else %}N/A{% endif %}</div>
+        <div>High <span class="highlow">{{ data.todays_high_temperature }}</span></div>
+        <div>Low <span class="highlow">{{ data.todays_low_temperature }}</span></div>
+        <div class="detail">Wind:{{ data.current_wind }}</div>
+        <div class="detail">Humidity: {{data.current_humidity}}</div>
+        <div class="detail">Pressure: {{ data.current_pressure}} </div>
       </div>
     </div>
-    <div class="row current-description">{{ now.hour }}</div>
+    <div class="row current-description">{{ data.short_forecast }}</div>
 
 
     <!-- *********** Hourly forecast *********** -->
     <div class="hourly-forecast-group">
       <div class="row">
-        {% for item in hourly %}
-          <div class="col-1">{{ item.time }}</div>
+        {% for forecast_hour in data.hourly_forecast %}
+          <div class="col-1">{{ forecast_hour.time }}</div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in hourly %}
-          <div class="col-1"><img class="forecast-image" src="{{ item.icon }}" /></div>
+        {% for forecast_hour in data.hourly_forecast %}
+          <div class="col-1"><img class="forecast-image" src="{{ forecast_hour.icon_src }}" /></div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in hourly %}
-          <div class="col-1">{% if item.temp is not none %}{{ item.temp | int }}&deg;{% else %}N/A{% endif %}</div>
+        {% for forecast_hour in data.hourly_forecast %}
+          <div class="col-1">{{ forecast_hour.temperature }}</div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in hourly %}
-          <div class="col-1 forecast-description">{{ item.shortForecast }}</div>
+        {% for forecast_hour in data.hourly_forecast %}
+          <div class="col-1 forecast-description">{{ forecast_hour.short_forecast }}</div>
         {% endfor %}
       </div>
     </div>
 
     <!-- *********** Today's forecast *********** -->
-    <!-- <div class="row week-forecast">{{ now.forecast }}</div> -->
+    <!-- <div class="row week-forecast">{{ data.detailed_fForecast }}</div> -->
 
-    <!-- *********** Daily forecast *********** -->
+    <!-- *********** data.dailyForecast forecast *********** -->
     <div class="daily-forecast-group">
       <div class="row title">6 Day Forecast</div>
       <div class="row">
-        {% for item in daily %}
-          <div class="col-1">{{ item.date }}</div>
+        {% for forecast_day in data.daily_forecast %}
+          <div class="col-1">{{ forecast_day.date }}</div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in daily %}
-          <div class="col-1">{{ item.day }}</div>
+        {% for forecast_day in data.daily_forecast %}
+          <div class="col-1">{{ forecast_day.day_of_week }}</div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in daily %}
-          <div class="col-1"><img class="forecast-image" src="{{ item.icon }}" /></div>
+        {% for forecast_day in data.daily_forecast %}
+          <div class="col-1"><img class="forecast-image" src="{{ forecast_day.icon_src }}" /></div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in daily %}
+        {% for forecast_day in data.daily_forecast %}
           <div class="col-1">
-            <span>{% if item.high is not none %}{{ item.high| int }}&deg;{% else %}N/A{% endif %}</span>
+            <span>{{forecast_day.high_temperature}}</span>
             <span> / </span>
-            <span>{% if item.high is not none %}{{ item.low| int }}&deg;{% else %}N/A{% endif %}</span>
+            <span>{{forecast_day.low_temperature}}</span>
           </div>
         {% endfor %}
       </div>
       <div class="row">
-        {% for item in daily %}
-          <div class="col-1 forecast-description">{{ item.shortForecast }}</div>
+        {% for forecast_day in data.daily_forecast %}
+          <div class="col-1 forecast-description">{{ forecast_day.short_forecast }}</div>
         {% endfor %}
       </div>
     </div>
   </div>
 
   <div class="footer row">
-    <div>Forecast from {{ now.city }}</div>
-    <div>Last Updated: {{ now.timestamp }}</div>
+    <div>Forecast from {{data.location}} </div>
+    <div>Last Updated:  {{data.last_updated}} </div>
   </div>
+{% else %}
+  <div>Having difficulty display weather</div>
+{% endif %}
+
 </body>
 </html>
