@@ -1,3 +1,11 @@
+## NOTICE - Replaced by [Home-Is-Where-You-Hang-Your-Hack/Nook-weather-NWS](https://github.com/Home-Is-Where-You-Hang-Your-Hack/Nook-weather-NWS)
+
+**Due to various instabilities and connection issues with Weather.gov API that were difficult to correct using a third party library, I decided to rewrite this.
+This version is no longer maintained.**
+  
+  
+<hr />
+
 [NOAA/NWS](https://www.weather.gov) version of [nook-weather](https://github.com/TheCase/nook-weather).
 
 #### Requirements
